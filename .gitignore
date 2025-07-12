@@ -1,0 +1,15 @@
+# Node.js
+medusa-backend/node_modules/
+medusa-backend/.env
+medusa-backend/dist/
+medusa-backend/*.log
+
+# Terraform
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/.terraform/
+terraform/*.tfvars # Important: DO NOT COMMIT sensitive variables
+terraform/.terraform.lock.hcl
+
+# Docker
+medusa-backend/.dockerignore
