@@ -1,5 +1,22 @@
 # main.tf
 
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+
+  backend "s3" {
+    bucket         = "venur0071-medusa" # <-- REPLACE with your S3 bucket name
+    key            = "medusa-commerce/terraform.tfstate"
+    region         = "ap-south-1" # <-- REPLACE with your chosen AWS region
+    dynamodb_table = "terraform-lock-table"
+    encrypt        = true
+  }
+}
+
 provider "aws" {
   region = var.aws_region
 }
