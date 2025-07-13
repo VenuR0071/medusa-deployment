@@ -14,7 +14,7 @@
       engine_version       = var.db_engine_version
       instance_class       = var.db_instance_type
       identifier           = "${var.project_name}-medusa-db"
-      name                 = "${var.project_name}-medusa-db"
+      db_name                 = "${var.project_name}-medusa-db"
       username             = var.db_username
       password             = var.db_password
       db_subnet_group_name = aws_db_subnet_group.main.name
