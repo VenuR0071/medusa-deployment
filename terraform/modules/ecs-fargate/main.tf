@@ -123,7 +123,7 @@
           essential = true,
 
           # ADD THIS LINE TEMPORARILY FOR MIGRATIONS:
-          command = ["yarn", "run", "medusa", "migrations", "run"], # <--- ADD THIS LINE
+          command = ["yarn", "run", "medusa", "db:setup"], # <--- ADD THIS LINE
           portMappings = [
             {
               containerPort = 9000,
