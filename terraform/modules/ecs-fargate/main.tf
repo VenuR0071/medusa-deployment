@@ -217,15 +217,19 @@
     }
 
     resource "aws_lb_listener" "http" {
-      load_balancer_arn = aws_lb.medusa_backend.arn
-      port              = 80
-      protocol          = "HTTP"
+  load_balancer_arn = aws_lb.medusa_backend.arn
+  port              = 80
+  protocol          = "HTTP"
 
-      default_action {
-        type             = "forward"
-        target_group_arn = aws_lb_target_group.medusa_backend.arn
-      }
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/html"
+      status_code  = "200" # Return a 200 OK status
+      message_body = "<h1>Service Unavailable</h1><p>Our e-commerce service is currently unavailable. We are working to restore it as soon as possible. Thank you for your patience!</p><p>Please check back later.</p>"
     }
+  }
+}
 
     resource "aws_ecs_service" "medusa_backend" {
       name            = "${var.project_name}-medusa-backend-service"
