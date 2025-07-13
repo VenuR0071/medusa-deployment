@@ -25,6 +25,8 @@ RUN yarn build
 RUN yarn install --frozen-lockfile --production=true
 
 # --- NEW ADDITIONS FOR ENTRYPOINT ---
+RUN yarn run medusa build
+
 
 # Copy the entrypoint script into the image
 # Ensure entrypoint.sh is in the same directory as your Dockerfile (medusa-backend/)
@@ -44,4 +46,4 @@ EXPOSE 9000
 
 # Command to run the application
 # Medusa's `start` script will typically run the compiled JS from `dist`
-CMD ["yarn", "start"]
+CMD ["medusa","start"]
