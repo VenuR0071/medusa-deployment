@@ -12,4 +12,3 @@ terraform/*.tfvars # Important: DO NOT COMMIT sensitive variables
 terraform/.terraform.lock.hcl
 
 # Docker
-medusa-backend/.dockerignore

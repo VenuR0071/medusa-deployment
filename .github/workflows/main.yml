@@ -1,0 +1,116 @@
+name: Deploy Medusa Backend to AWS ECS Fargate
+
+on:
+  push:
+    branches:
+      - main # Trigger on pushes to the main branch
+
+env:
+  AWS_REGION: ap-south-1 # IMPORTANT: Change to your chosen AWS region (e.g., us-east-1, ap-south-1)
+  PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+  ECR_REPOSITORY: medusa-backend # Must match the ECR repository name in terraform/modules/ecs-fargate/main.tf
+  ECS_CLUSTER: ${{ vars.PROJECT_NAME }}-cluster
+  ECS_SERVICE: ${{ vars.PROJECT_NAME }}-medusa-backend-service
+  ECS_CONTAINER_NAME: medusa-backend # Must match the container name in ECS task definition
+  DB_USERNAME: ${{ secrets.DB_USERNAME }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  TF_STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
+  STORE_CORS: ${{ vars.STORE_CORS }}
+  ADMIN_CORS: ${{ vars.ADMIN_CORS }}
+  AUTH_CORS: ${{ vars.AUTH_CORS }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  COOKIE_SECRET: ${{ secrets.COOKIE_SECRET }}
+  NODE_ENV: production # Set the Node.js environment to production
+
+permissions:
+  contents: read
+  packages: write # Needed for pushing Docker images to GitHub Packages (if used)
+  id-token: write # Needed for OIDC if you switch from Access Keys
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production # Using a GitHub environment for better security and organization
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.x.x" # Specify a compatible version, e.g., "1.8.x" or ">=1.0.0"
+
+      - name: Terraform Init
+        run: terraform init -backend-config="bucket=${{ env.TF_STATE_BUCKET }}" -backend-config="key=${{ env.PROJECT_NAME }}/terraform.tfstate" -backend-config="region=${{ env.AWS_REGION }}" -backend-config="dynamodb_table=terraform-lock-table"
+        working-directory: ./terraform
+
+      - name: Terraform Plan
+        run: terraform plan -var="aws_region=${{ env.AWS_REGION }}" -var="db_username=${{ env.DB_USERNAME }}" -var="db_password=${{ env.DB_PASSWORD }}" -var="store_cors=${{ env.STORE_CORS }}" -var="admin_cors=${{ env.ADMIN_CORS }}" -var="auth_cors=${{ env.AUTH_CORS }}"
+        working-directory: ./terraform
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -var="aws_region=${{ env.AWS_REGION }}" -var="db_username=${{ env.DB_USERNAME }}" -var="db_password=${{ env.DB_PASSWORD }}" -var="store_cors=${{ env.STORE_CORS }}" -var="admin_cors=${{ env.ADMIN_CORS }}" -var="auth_cors=${{ env.AUTH_CORS }}"
+        working-directory: ./terraform
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Get ECR Repository URI
+        id: get-ecr-uri
+        run: echo "ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} -f medusa-backend/Dockerfile .
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+
+      - name: Render AWS ECS task definition
+        id: render-task-def
+        run: |
+          # Extracting values from terraform outputs for dynamic environment variables
+          # This needs a slightly different approach than a direct reference to task-definition.json
+          # as the rendered task-definition.json is not directly available as an artifact.
+          # Instead, we need to generate it or use `aws ecs describe-task-definition`
+          # The simplest way is to pass direct values from workflow environment variables.
+          # This action takes the task definition ARN from Terraform output.
+          # We are modifying the 'main.yml' to directly pass the environment variables
+          # as they are available in the GitHub Actions environment.
+
+          # This step is often for when task definition is modified in a separate file,
+          # but here environment variables are injected directly during deploy.
+          # For simplicity, we can remove this specific `render-task-def` action
+          # if the deploy action directly accepts env vars, or fetch the latest.
+
+          # Given the current setup, we will directly provide env vars in the deploy step.
+          # This action isn't strictly needed if we're not modifying a local task-def file.
+          echo "Using directly passed environment variables for task definition update."
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.terraform-apply.outputs.task_definition_arn }} # Referencing output from Terraform Apply
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+          # Provide the environment variables directly here.
+          # The `aws-actions/amazon-ecs-deploy-task-definition` allows `override-container-definitions`
+          # or direct `environment` in some versions, but the simplest is to ensure the
+          # task-definition already has placeholders or uses secrets correctly.
+          # Given your medusa-config.ts uses ENV, they will be picked up by the running container.
+          # The task definition itself is updated with the image, and then the service updates.
+          # The actual environment variables for the container are already embedded in the
+          # task definition rendered by Terraform based on its variables.
+          # Thus, we mostly need to just push the new image and tell ECS to update.

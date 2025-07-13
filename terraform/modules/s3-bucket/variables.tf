@@ -1,6 +1,10 @@
-# modules/s3-bucket/variables.tf
 
-variable "project_name" {
-  description = "Name prefix for resources."
-  type        = string
-}
+    variable "project_name" {
+      description = "The name of the project."
+      type        = string
+    }
+
+    variable "aws_region" {
+      description = "The AWS region."
+      type        = string
+    }
