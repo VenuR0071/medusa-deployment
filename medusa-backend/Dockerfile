@@ -28,8 +28,7 @@ RUN yarn install --frozen-lockfile --production=true
 
 # Copy the entrypoint script into the image
 # Ensure entrypoint.sh is in the same directory as your Dockerfile (medusa-backend/)
-COPY ./entrypoint.sh /app/entrypoint.sh
-
+COPY medusa-backend/entrypoint.sh /app/entrypoint.sh
 # Make the entrypoint script executable
 RUN chmod +x /app/entrypoint.sh
 
