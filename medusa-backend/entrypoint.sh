@@ -33,8 +33,8 @@ EOF
 echo "Content of /app/.env (for debugging):"
 cat /app/.env # For debugging, this will show the .env content in logs
 
-echo "Starting database migrations with: yarn run medusa db:setup"
-yarn run medusa db:setup
+echo "Starting database migrations with: yarn run medusa migrations run"
+yarn run medusa migrations run
 
 echo "Database migrations complete. Executing original command to start Medusa backend..."
 # The .env file created above will remain for the main application process if it uses dotenv.
