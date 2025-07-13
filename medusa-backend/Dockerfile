@@ -24,6 +24,22 @@ RUN yarn build
 # Remove devDependencies to keep image size small for production
 RUN yarn install --frozen-lockfile --production=true
 
+# --- NEW ADDITIONS FOR ENTRYPOINT ---
+
+# Copy the entrypoint script into the image
+# Ensure entrypoint.sh is in the same directory as your Dockerfile (medusa-backend/)
+COPY ./entrypoint.sh /app/entrypoint.sh
+
+# Make the entrypoint script executable
+RUN chmod +x /app/entrypoint.sh
+
+# Set this script as the ENTRYPOINT for the container
+# This means /app/entrypoint.sh will be run first when the container starts.
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# --- END NEW ADDITIONS ---
+
+
 # Expose the port Medusa runs on (default is 9000)
 EXPOSE 9000
 
