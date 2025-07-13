@@ -81,7 +81,7 @@ jobs:
           # Output the full image URI for later steps
           echo "IMAGE_URI=$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
 
-            # --- NEW MIGRATION STEP (using AWS CLI) ---
+           # --- CORRECTED MIGRATION STEP (using AWS CLI) ---
       - name: Run Medusa DB Migrations (AWS CLI)
         id: run-migrations-task
         run: |
@@ -89,22 +89,20 @@ jobs:
           DB_URL="postgresql://${{ env.DB_USERNAME }}:${{ env.DB_PASSWORD }}@${{ env.DB_ENDPOINT }}:5432/${{ env.DB_NAME }}"
 
           # Get the latest active task definition ARN.
-          # This assumes your main service's task definition is always the latest.
-          # If not, you might need to query for a specific family.
           TASK_DEFINITION_ARN=$(aws ecs describe-services --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} \
                                 --query 'services[0].taskDefinition' --output text)
           
-          # If the service hasn't been deployed yet (first run), this might be empty.
-          # As a fallback, use the task definition family directly.
-          if [ -z "$TASK_DEFINITION_ARN" ]; then
-              echo "Service task definition not found, trying family: ${{ env.PROJECT_NAME }}-medusa-backend-task"
+          # Fallback if service task definition is not found (e.g., first deployment)
+          if [ -z "$TASK_DEFINITION_ARN" ] || [ "$TASK_DEFINITION_ARN" == "None" ]; then
+              echo "Service task definition not found or service not yet created. Using task definition family directly."
+              # This assumes your Terraform has been applied at least once to create the task definition.
               TASK_DEFINITION_ARN="${{ env.PROJECT_NAME }}-medusa-backend-task"
           fi
 
           echo "Using Task Definition ARN/Family: $TASK_DEFINITION_ARN"
-          echo "Running migration with image: ${{ steps.build-and-push-image.outputs.IMAGE_URI }}"
 
           # Construct the command override
+          # Note: No 'image' override here, as the task definition already has the correct image
           COMMAND_OVERRIDE="[\"/bin/sh\", \"-c\", \"DATABASE_URL=${DB_URL} yarn run medusa db:setup\"]"
 
           # Get the task execution role ARN from the task definition
@@ -115,19 +113,18 @@ jobs:
           echo "Using Execution Role ARN: $EXECUTION_ROLE_ARN"
 
           # Run the one-off ECS task for migrations
-          # Using --no-cli-pager to prevent pagination issues in GitHub Actions logs
           RUN_TASK_OUTPUT=$(aws ecs run-task --cluster ${{ env.ECS_CLUSTER }} \
                                               --task-definition $TASK_DEFINITION_ARN \
                                               --launch-type FARGATE \
                                               --network-configuration "awsvpcConfiguration={subnets=[${{ secrets.PRIVATE_SUBNETS }}],securityGroups=[${{ secrets.APP_SECURITY_GROUP }}],assignPublicIp=DISABLED}" \
-                                              --overrides "containerOverrides=[{name='${{ env.ECS_CONTAINER_NAME }}',image='${{ steps.build-and-push-image.outputs.IMAGE_URI }}',command=${COMMAND_OVERRIDE}}]" \
+                                              --overrides "containerOverrides=[{name='${{ env.ECS_CONTAINER_NAME }}',command=${COMMAND_OVERRIDE}}]" \
                                               --count 1 \
                                               --started-by "github-actions-migrations" \
                                               --platform-version LATEST \
                                               --query 'tasks[0].taskArn' --output text --no-cli-pager)
           
           if [ -z "$RUN_TASK_OUTPUT" ]; then
-              echo "Error: Failed to start migration task."
+              echo "Error: Failed to start migration task. Check AWS CLI output and permissions."
               exit 1
           fi
 
@@ -156,7 +153,8 @@ jobs:
           else
               echo "Migration task completed successfully."
           fi
-      # --- END NEW MIGRATION STEP ---
+      # --- END CORRECTED MIGRATION STEP ---
+
 
       # NEW STEP: Fetch the latest Task Definition JSON from AWS
       - name: Fetch current ECS Task Definition
