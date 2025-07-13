@@ -127,7 +127,6 @@ locals {
           essential = true,
 
           # ADD THIS LINE TEMPORARILY FOR MIGRATIONS:
-          command = ["/bin/sh", "-c", "DATABASE_URL=${local.full_database_url} yarn run medusa db:setup"],
           portMappings = [
             {
               containerPort = 9000,

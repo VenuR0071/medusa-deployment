@@ -81,6 +81,36 @@ jobs:
           # Output the full image URI for later steps
           echo "IMAGE_URI=$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
 
+           # --- NEW MIGRATION STEP ---
+      - name: Run Medusa DB Migrations
+        uses: aws-actions/amazon-ecs-run-task@v1
+        with:
+          # Use the task definition family from your env vars
+          task-definition: ${{ env.ECS_TASK_DEFINITION }} 
+          cluster: ${{ env.ECS_CLUSTER }}
+          # Use the image that was just built
+          image: ${{ steps.build-and-push-image.outputs.IMAGE_URI }}
+          # IMPORTANT: Override the command for the migration task
+          # Use /bin/sh -c and explicitly set DATABASE_URL inline
+          override-container-command: |
+            ["/bin/sh", "-c", "DATABASE_URL=postgresql://${{ env.DB_USERNAME }}:${{ env.DB_PASSWORD }}@${{ env.DB_ENDPOINT }}:5432/${{ env.DB_NAME }} yarn run medusa db:setup"]
+          
+          # --- IMPORTANT: REPLACE THESE WITH YOUR ACTUAL VPC SUBNET AND SECURITY GROUP IDs ---
+          # These should be your PRIVATE subnets where your Fargate tasks can reach RDS/Redis
+          subnets: "subnet-0abcdef1234567890,subnet-0fedcba9876543210" # <-- REPLACE WITH YOUR PRIVATE SUBNET IDs
+          # The security group that allows outbound connections to RDS (port 5432) and Redis (port 6379)
+          security-groups: "sg-0123456789abcdef0" # <-- REPLACE WITH YOUR APP/DATABASE SECURITY GROUP ID
+          
+          # Wait for the task to complete
+          wait-for-task-started: true
+          wait-for-task-stopped: true
+          
+          # Optional: You can also specify CPU/Memory for the migration task if it needs less
+          # cpu: "256"
+          # memory: "512"
+
+      # --- END NEW MIGRATION STEP ---
+
       # NEW STEP: Fetch the latest Task Definition JSON from AWS
       - name: Fetch current ECS Task Definition
         id: fetch-task-definition
