@@ -9,6 +9,8 @@ if [ -z "$DATABASE_URL" ]; then echo "Error: DATABASE_URL is not set. Cannot pro
 if [ -z "$REDIS_URL" ]; then echo "Error: REDIS_URL is not set. Cannot proceed."; exit 1; fi
 if [ -z "$JWT_SECRET" ]; then echo "Error: JWT_SECRET is not set. Cannot proceed."; exit 1; fi
 if [ -z "$COOKIE_SECRET" ]; then echo "Error: COOKIE_SECRET is not set. Cannot proceed."; exit 1; fi
+if [ -z "$AWS_ACCESS_KEY_ID" ]; then echo "Error: AWS_ACCESS_KEY_ID is not set. Cannot proceed."; exit 1; fi
+if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then echo "Error: AWS_SECRET_ACCESS_KEY is not set. Cannot proceed."; exit 1; fi
 # Add checks for other variables your app *absolutely* needs to function
 
 echo "Creating .env file for Medusa backend from container environment variables..."
@@ -25,6 +27,8 @@ ADMIN_CORS=$ADMIN_CORS
 AUTH_CORS=$AUTH_CORS
 S3_BUCKET=$S3_BUCKET
 S3_REGION=$S3_REGION
+AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 # IMPORTANT: Add any other environment variables here that your Medusa app
 # expects to read from a .env file (e.g., MinIO/S3 keys, Stripe keys, etc.)
 # If they are set in your ECS Task Definition, they will be available as shell variables.
