@@ -75,4 +75,6 @@ terraform {
       auth_cors = var.auth_cors # NEW for Medusa v2
       db_username = var.db_username
       db_password = var.db_password
+      aws_access_key_id = var.aws_access_key_id      # Add this line
+  aws_secret_access_key = var.aws_secret_access_key # Add this line
     }

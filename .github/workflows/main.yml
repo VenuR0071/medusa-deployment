@@ -22,6 +22,7 @@ env:
   COOKIE_SECRET: ${{ secrets.COOKIE_SECRET }}
   NODE_ENV: production # Set the Node.js environment to production
 
+
 permissions:
   contents: read
   packages: write # Needed for pushing Docker images to GitHub Packages (if used)
@@ -54,12 +55,12 @@ jobs:
         working-directory: ./terraform
 
       - name: Terraform Plan
-        run: terraform plan -var="aws_region=${{ env.AWS_REGION }}" -var="db_username=${{ env.DB_USERNAME }}" -var="db_password=${{ env.DB_PASSWORD }}" -var="store_cors=${{ env.STORE_CORS }}" -var="admin_cors=${{ env.ADMIN_CORS }}" -var="auth_cors=${{ env.AUTH_CORS }}"
+        run: terraform plan -var="aws_region=${{ env.AWS_REGION }}" -var="db_username=${{ env.DB_USERNAME }}" -var="db_password=${{ env.DB_PASSWORD }}" -var="store_cors=${{ env.STORE_CORS }}" -var="admin_cors=${{ env.ADMIN_CORS }}" -var="auth_cors=${{ env.AUTH_CORS }}" -var="aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" -var="aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
         working-directory: ./terraform
 
       - name: Terraform Apply
         id: terraform-apply-step # Added ID to this step to reference its outputs (though not directly used for task-def input)
-        run: terraform apply -auto-approve -var="aws_region=${{ env.AWS_REGION }}" -var="db_username=${{ env.DB_USERNAME }}" -var="db_password=${{ env.DB_PASSWORD }}" -var="store_cors=${{ env.STORE_CORS }}" -var="admin_cors=${{ env.ADMIN_CORS }}" -var="auth_cors=${{ env.AUTH_CORS }}"
+        run: terraform apply -auto-approve -var="aws_region=${{ env.AWS_REGION }}" -var="db_username=${{ env.DB_USERNAME }}" -var="db_password=${{ env.DB_PASSWORD }}" -var="store_cors=${{ env.STORE_CORS }}" -var="admin_cors=${{ env.ADMIN_CORS }}" -var="auth_cors=${{ env.AUTH_CORS }}" -var="aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" -var="aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
         working-directory: ./terraform
 
       - name: Login to Amazon ECR

@@ -75,4 +75,15 @@
       description = "Comma-separated list of allowed origins for authentication API CORS."
       type        = string
     }
+    variable "aws_access_key_id" {
+  description = "AWS Access Key ID for the ECS task to use for S3 access."
+  type        = string
+  sensitive   = true # Mark as sensitive to prevent logging
+}
+
+variable "aws_secret_access_key" {
+  description = "AWS Secret Access Key for the ECS task to use for S3 access."
+  type        = string
+  sensitive   = true # Mark as sensitive to prevent logging
+}
 
