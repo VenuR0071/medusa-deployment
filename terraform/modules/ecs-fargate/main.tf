@@ -179,12 +179,13 @@ locals {
               name  = "COOKIE_SECRET",
               value = "supersecret-cookie-key" # CHANGE IN PRODUCTION! Use AWS Secrets Manager.
             },
+             { name = "AWS_ACCESS_KEY_ID", value = var.aws_access_key_id },
+            { name = "AWS_SECRET_ACCESS_KEY", value = var.aws_secret_access_key },
             {
               name  = "NODE_ENV",
               value = "production"
             }
-            { name = "AWS_ACCESS_KEY_ID", value = var.aws_access_key_id },
-            { name = "AWS_SECRET_ACCESS_KEY", value = var.aws_secret_access_key }
+           
           ]
         }
       ])
