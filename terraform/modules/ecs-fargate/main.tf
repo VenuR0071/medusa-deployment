@@ -27,6 +27,10 @@
         Name = "${var.project_name}-backend-logs"
       }
     }
+    # Add this block:
+locals {
+  full_database_url = "postgresql://${var.db_username}:${var.db_password}@${var.db_endpoint}:5432/medusadb"
+}
 
     resource "aws_iam_role" "ecs_task_execution_role" {
       name = "${var.project_name}-ecsTaskExecutionRole"
@@ -123,7 +127,7 @@
           essential = true,
 
           # ADD THIS LINE TEMPORARILY FOR MIGRATIONS:
-          command = ["yarn", "run", "medusa", "db:setup"], # <--- ADD THIS LINE
+          command = ["/bin/sh", "-c", "DATABASE_URL=${local.full_database_url} yarn run medusa db:setup"],
           portMappings = [
             {
               containerPort = 9000,
