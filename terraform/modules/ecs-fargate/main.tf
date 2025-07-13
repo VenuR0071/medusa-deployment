@@ -121,6 +121,9 @@
           cpu       = 1024,
           memory    = 2048,
           essential = true,
+
+          # ADD THIS LINE TEMPORARILY FOR MIGRATIONS:
+          command = ["yarn", "run", "medusa", "migrations", "run"], # <--- ADD THIS LINE
           portMappings = [
             {
               containerPort = 9000,
