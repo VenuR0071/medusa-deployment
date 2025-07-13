@@ -8,7 +8,9 @@ WORKDIR /app
 # Use --omit=dev during installation to prevent devDependencies from being installed
 # but we need dev dependencies for the build step.
 # So, we install all, then build, then prune.
-COPY medusa-backend/package*.json ./
+# Copy package.json and yarn.lock
+COPY medusa-backend/package.json ./
+COPY medusa-backend/yarn.lock ./
 
 # Install all dependencies (including devDependencies for build)
 RUN yarn install --frozen-lockfile
