@@ -139,7 +139,7 @@
           environment = [
             {
               name  = "DATABASE_URL",
-              value = "postgresql://${var.db_username}:${var.db_password}@${var.db_endpoint}:5432/${var.project_name}-medusa-db"
+              value = "postgresql://${var.db_username}:${var.db_password}@${var.db_endpoint}:5432/${var.project_name}-medusadb"
             },
             {
               name  = "REDIS_URL",
