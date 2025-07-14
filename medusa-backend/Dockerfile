@@ -52,7 +52,7 @@ COPY --from=builder /app/.medusa/server/ ./
 # Since `medusa build` handles transpilation, ensure you copy the *compiled* versions or just
 # the necessary config files. For simplicity, if your medusa-config.js is at the root
 # of your backend, copy it.
-COPY medusa-backend/medusa-config.js ./
+COPY medusa-backend/medusa-config.ts ./
 # If you have an .env file or specific custom files needed at runtime (not built)
 # COPY medusa-backend/.env ./.env
 # COPY medusa-backend/src/some-custom-file.js ./src/some-custom-file.js
