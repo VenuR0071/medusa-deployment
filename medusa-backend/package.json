@@ -27,8 +27,8 @@
     "@medusajs/admin": "^7.1.18",
     "@medusajs/admin-sdk": "2.8.7",
     "@medusajs/cli": "2.8.7",
-    "@medusajs/file": "^2.8.7",
-    "@medusajs/file-s3": "^2.8.7",
+    "@medusajs/file": "2.8.7",
+    "@medusajs/file-s3": "2.8.7",
     "@medusajs/framework": "2.8.7",
     "@medusajs/medusa": "2.8.7",
     "@mikro-orm/core": "6.4.3",
@@ -57,7 +57,6 @@
     "react-dom": "^18.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2",
-    "vite": "^5.0.0",
     "yalc": "^1.0.0-pre.53"
   },
   "engines": {
