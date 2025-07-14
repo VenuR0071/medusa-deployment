@@ -21,11 +21,12 @@ COPY medusa-backend/ .
 # Build the Medusa project (transpile TypeScript to JavaScript)
 RUN yarn build
 
-# Remove devDependencies to keep image size small for production
-RUN yarn install --frozen-lockfile --production=true
 
 # --- NEW ADDITIONS FOR ENTRYPOINT ---
-RUN yarn run medusa build
+#UN yarn run medusa build
+
+# Remove devDependencies to keep image size small for production
+RUN yarn install --frozen-lockfile --production=true
 
 
 # Copy the entrypoint script into the image
