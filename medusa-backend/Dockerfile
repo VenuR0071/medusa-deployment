@@ -27,19 +27,6 @@ RUN yarn install --frozen-lockfile --production=true
 # --- NEW ADDITIONS FOR ENTRYPOINT ---
 RUN yarn run medusa build
 
-# --- TEMPORARY DEBUGGING STEPS: Add these lines ---
-RUN echo "--- Listing contents of /app ---"
-RUN ls -la /app
-RUN echo "--- Listing contents of /app/dist (if present) ---"
-RUN ls -la /app/dist
-RUN echo "--- Listing contents of /app/node_modules/@medusajs/medusa/dist (if present) ---"
-RUN ls -la /app/node_modules/@medusajs/medusa/dist
-RUN echo "--- Listing contents of /app/node_modules/@medusajs/admin-ui/build (if present) ---"
-RUN ls -la /app/node_modules/@medusajs/admin-ui/build
-RUN echo "--- Searching for index.html within /app ---"
-RUN find /app -name "index.html"
-# --- END TEMPORARY DEBUGGING STEPS ---
-
 
 # Copy the entrypoint script into the image
 # Ensure entrypoint.sh is in the same directory as your Dockerfile (medusa-backend/)
