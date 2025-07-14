@@ -46,4 +46,4 @@ EXPOSE 9000
 
 # Command to run the application
 # Medusa's `start` script will typically run the compiled JS from `dist`
-CMD ["medusa","start"]
+CMD ["yarn","start"]
