@@ -36,19 +36,6 @@ module.exports = defineConfig({
         ],
       },
     },
-       // --- ADD THIS 'admin' MODULE CONFIGURATION ---
-    admin: {
-      resolve: "@medusajs/admin",
-      options: {
-        // Set to false for production, as the build is done in Dockerfile
-        autoRebuild: false,
-        // Serve the Admin UI only in production environments
-        serve: process.env.NODE_ENV === "production",
-        // Crucially, specify the path where 'medusa build' outputs the files.
-        // This path is relative to the /app WORKDIR in your Docker container.
-        path: "node_modules/@medusajs/admin-ui/build",
-      },
-    },
-    // --- END 'admin' MODULE CONFIGURATION ---
+       
   }
 })
