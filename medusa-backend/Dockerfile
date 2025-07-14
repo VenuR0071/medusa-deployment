@@ -53,6 +53,11 @@ COPY --from=builder /app/.medusa/server/ ./
 # the necessary config files. For simplicity, if your medusa-config.js is at the root
 # of your backend, copy it.
 COPY medusa-backend/medusa-config.ts ./
+RUN echo "--- Inspecting /app/public directory contents in production image ---"
+RUN ls -laR /app/public || echo "ERROR: /app/public not found or empty!"
+RUN echo "--- Check specifically for index.html in expected Admin path ---"
+RUN ls -la /app/public/admin/index.html || echo "ERROR: /app/public/admin/index.html NOT FOUND after copy!"
+RUN echo "--- END TEMPORARY DEBUGGING ---"
 # If you have an .env file or specific custom files needed at runtime (not built)
 # COPY medusa-backend/.env ./.env
 # COPY medusa-backend/src/some-custom-file.js ./src/some-custom-file.js
