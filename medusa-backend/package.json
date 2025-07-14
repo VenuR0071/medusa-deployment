@@ -2,7 +2,8 @@
   "name": "medusa-backend",
   "version": "0.0.1",
   "resolutions": {
-    "rollup": "4.13.0" 
+    "rollup": "4.13.0" ,
+     "zod": "4.0.0"
   },
 
   "description": "A starter for Medusa projects.",
