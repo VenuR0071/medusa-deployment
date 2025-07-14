@@ -1,9 +1,7 @@
 {
   "name": "medusa-backend",
   "version": "0.0.1",
-  "resolutions": {
-    "rollup": "3.29.0"
-  },
+
   "description": "A starter for Medusa projects.",
   "author": "Medusa (https://medusajs.com)",
   "license": "MIT",
@@ -59,7 +57,7 @@
     "react-dom": "^18.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2",
-    "vite": "^4.4.2",
+    "vite": "^5.0.0",
     "yalc": "^1.0.0-pre.53"
   },
   "engines": {
