@@ -23,9 +23,10 @@ RUN yarn install --frozen-lockfile
 COPY medusa-backend/ .
 
 # Add debug steps to see versions
-RUN echo "--- Debugging Yarn dependency tree for Vite and Rollup ---"
+RUN echo "--- Debugging Yarn dependency tree for Vite and Rollup and Zod ---"
 RUN yarn why vite
 RUN yarn why rollup
+RUN yarn why zod # <--- ADD THIS NEW LINE
 RUN echo "--- End Debugging ---"
 
 # Build the Medusa project (transpile TypeScript to JavaScript)
