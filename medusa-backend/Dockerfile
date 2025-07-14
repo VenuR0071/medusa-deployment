@@ -15,6 +15,29 @@ COPY medusa-backend/yarn.lock ./
 # Install all dependencies (including devDependencies for build)
 RUN yarn install --frozen-lockfile
 
+
+# --- TEMPORARY DEBUGGING STEPS: Add these lines ---
+RUN echo "--- Verifying existence and content of @types/bonjour ---"
+RUN ls -la /app/node_modules/@types/bonjour || echo "ERROR: @types/bonjour directory not found!"
+RUN ls -la /app/node_modules/@types/bonjour/index.d.ts || echo "ERROR: @types/bonjour/index.d.ts not found!"
+
+RUN echo "--- Verifying existence and content of @types/json-schema ---"
+RUN ls -la /app/node_modules/@types/json-schema || echo "ERROR: @types/json-schema directory not found!"
+RUN ls -la /app/node_modules/@types/json-schema/index.d.ts || echo "ERROR: @types/json-schema/index.d.ts not found!"
+
+RUN echo "--- Verifying existence and content of @types/parse-json ---"
+RUN ls -la /app/node_modules/@types/parse-json || echo "ERROR: @types/parse-json directory not found!"
+RUN ls -la /app/node_modules/@types/parse-json/index.d.ts || echo "ERROR: @types/parse-json/index.d.ts not found!"
+
+RUN echo "--- Verifying existence and content of @types/resolve ---"
+RUN ls -la /app/node_modules/@types/resolve || echo "ERROR: @types/resolve directory not found!"
+RUN ls -la /app/node_modules/@types/resolve/index.d.ts || echo "ERROR: @types/resolve/index.d.ts not found!"
+
+RUN echo "--- Showing first 30 entries in /app/node_modules/@types/ (partial list) ---"
+RUN ls -la /app/node_modules/@types/ | head -n 30
+# --- END TEMPORARY DEBUGGING STEPS ---
+
+
 # Copy the entire Medusa backend project
 COPY medusa-backend/ .
 
@@ -27,6 +50,8 @@ RUN yarn build
 
 # Remove devDependencies to keep image size small for production
 RUN yarn install --frozen-lockfile --production=true
+
+
 
 
 # Copy the entrypoint script into the image
